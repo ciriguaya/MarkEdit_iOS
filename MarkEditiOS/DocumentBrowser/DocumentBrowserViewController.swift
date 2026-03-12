@@ -33,7 +33,6 @@ final class DocumentBrowserViewController: UIDocumentBrowserViewController {
     delegate = self
     allowsDocumentCreation = true
     allowsPickingMultipleItems = false
-    browserUserInterfaceStyle = .automatic
     view.tintColor = .systemBlue
 
     NSLog("[MarkEditiOS] DocumentBrowserViewController viewDidLoad — view.frame: %@", NSCoder.string(for: view.frame))
@@ -114,11 +113,12 @@ private extension DocumentBrowserViewController {
         return
       }
 
-      NSLog("[MarkEditiOS] DocumentBrowserViewController presenting EditorViewController")
-      let editorVC = EditorViewController(document: document)
-      let nav = UINavigationController(rootViewController: editorVC)
-      nav.modalPresentationStyle = .fullScreen
-      self.present(nav, animated: true)
+      Task { @MainActor in
+        let editorVC = EditorViewController(document: document)
+        let nav = UINavigationController(rootViewController: editorVC)
+        nav.modalPresentationStyle = .fullScreen
+        self.present(nav, animated: true)
+      }
     }
   }
 }

@@ -302,7 +302,7 @@ final class EditorViewController: UIViewController {
       if hasFinishedLoading, let text = try? await bridge.core.getEditorText() {
         document.stringValue = text
       }
-      document.save(to: document.fileURL, for: .forOverwriting) { _ in }
+      await document.save(to: document.fileURL, for: .forOverwriting)
     }
   }
 
