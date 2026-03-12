@@ -15,6 +15,60 @@ MarkEdit is a free and **open-source** Markdown editor, for macOS. It's just lik
 >
 > Follow our Mastodon account [@MarkEditApp](https://mastodon.social/@MarkEditApp) for the latest updates.
 
+---
+
+## iOS Port
+
+> [!NOTE]
+> This repository contains an **unofficial community iOS port** of MarkEdit, built on top of the original open-source macOS app by the [MarkEdit-app](https://github.com/MarkEdit-app/MarkEdit) team. All credit for the core editor engine, CodeMirror integration, and shared frameworks belongs to the original authors. This iOS port is not affiliated with or endorsed by the original MarkEdit team.
+
+### About the iOS Implementation
+
+The iOS port reuses the existing shared frameworks (`MarkEditCore`, `MarkEditKit`) unchanged and adds a native iOS application target (`MarkEditiOS`) that wraps them with iOS-specific UI:
+
+- **Document browser** — built on `UIDocumentBrowserViewController`, integrating with the iOS Files app to open, create, and manage `.md` and plain-text files
+- **Editor** — the same CodeMirror 6-based editor used on macOS, embedded in a `WKWebView`
+- **Dark mode** — automatically follows the system appearance (dark/light); the editor theme defaults to _GitHub Dark_ in dark mode and _GitHub Light_ in light mode, and can be changed in Settings
+- **Toolbar** — quick-access formatting bar above the keyboard (bold, italic, headings, links, lists, etc.)
+- **Settings** — in-editor settings panel for theme, font size, line height, and more
+
+### Building the iOS App
+
+1. Open `MarkEdit.xcodeproj` in Xcode
+2. Select the **MarkEditiOS** scheme
+3. Choose an iOS simulator or device (iOS 26.2+)
+4. Build and run (`⌘R`)
+
+No additional dependencies or setup required — everything is self-contained in the project.
+
+### Architecture
+
+```
+MarkEditiOS/
+├── App/
+│   ├── AppDelegate.swift          # UIApplicationDelegate
+│   ├── SceneDelegate.swift        # UIWindowSceneDelegate — wires up the window
+│   └── AppPreferences.swift       # User defaults / theme selection
+├── DocumentBrowser/
+│   ├── DocumentBrowserViewController.swift   # Files app integration
+│   └── MarkEditDocument.swift                # UIDocument subclass
+├── Editor/
+│   ├── EditorViewController.swift  # WKWebView host, EditorModuleCore delegate
+│   ├── EditorChunkLoader.swift     # Streaming large files into the editor
+│   └── EditorToolbar.swift         # Keyboard accessory toolbar
+└── Settings/
+    └── SettingsViewController.swift  # Theme, font, line-height picker
+```
+
+The shared frameworks used by both macOS and iOS:
+
+| Framework | Purpose |
+|---|---|
+| `MarkEditCore` | CodeMirror 6 bridge — JS↔Swift messaging, editor commands |
+| `MarkEditKit` | Higher-level editor modules (core, completion, search, lint, …) |
+
+---
+
 ## Screenshots
 
 ![Screenshots 01](/Screenshots/01.png)

@@ -13,46 +13,18 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     willConnectTo session: UISceneSession,
     options connectionOptions: UIScene.ConnectionOptions
   ) {
-    // NSLog BEFORE the guard so we know if this method is called at all
-    NSLog("[MarkEditiOS] SceneDelegate scene(willConnectTo:) — scene type: %@", String(describing: type(of: scene)))
+    guard let windowScene = scene as? UIWindowScene else { return }
 
-    guard let windowScene = scene as? UIWindowScene else {
-      NSLog("[MarkEditiOS] SceneDelegate — guard FAILED: scene is not UIWindowScene, aborting")
-      return
-    }
-
-    // Show window immediately with a red background + spinner.
-    // If you see red in the simulator, SceneDelegate ran and makeKeyAndVisible succeeded.
     let window = UIWindow(windowScene: windowScene)
-    window.backgroundColor = .systemRed
-
-    let placeholder = UIViewController()
-    placeholder.view.backgroundColor = .systemRed
-    let spinner = UIActivityIndicatorView(style: .large)
-    spinner.color = .white
-    spinner.translatesAutoresizingMaskIntoConstraints = false
-    spinner.startAnimating()
-    placeholder.view.addSubview(spinner)
-    NSLayoutConstraint.activate([
-      spinner.centerXAnchor.constraint(equalTo: placeholder.view.centerXAnchor),
-      spinner.centerYAnchor.constraint(equalTo: placeholder.view.centerYAnchor),
-    ])
-
-    window.rootViewController = placeholder
+    window.backgroundColor = .systemBackground
     self.window = window
     window.makeKeyAndVisible()
-    NSLog("[MarkEditiOS] SceneDelegate makeKeyAndVisible done — red placeholder visible, frame=%@",
-          NSCoder.string(for: window.frame))
 
-    // Defer DocumentBrowserViewController init to avoid blocking the initial render.
-    // UIDocumentBrowserViewController.init() triggers heavy disk work on first launch
-    // (~9 seconds) that blocks the main thread. Deferring lets the red placeholder
-    // render before the block begins.
+    // Defer DocumentBrowserViewController init to the next run loop pass so the
+    // window renders first — UIDocumentBrowserViewController performs heavy disk
+    // work on first launch that would otherwise block the initial frame.
     DispatchQueue.main.async { [weak window] in
-      NSLog("[MarkEditiOS] SceneDelegate installing DocumentBrowserViewController")
-      let documentBrowser = DocumentBrowserViewController()
-      window?.rootViewController = documentBrowser
-      NSLog("[MarkEditiOS] SceneDelegate DocumentBrowserViewController is now rootVC")
+      window?.rootViewController = DocumentBrowserViewController()
     }
   }
 
