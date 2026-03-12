@@ -289,10 +289,20 @@ final class EditorViewController: UIViewController {
 
   func applySettingsToEditor() {
     guard hasFinishedLoading else { return }
-    bridge.config.setTheme(name: AppPreferences.Editor.theme)
+    bridge.config.setTheme(name: AppPreferences.Editor.effectiveTheme(for: traitCollection.userInterfaceStyle))
     bridge.config.setFontSize(fontSize: AppPreferences.Editor.fontSize)
     bridge.config.setLineWrapping(enabled: AppPreferences.Editor.lineWrapping)
     bridge.config.setShowLineNumbers(enabled: AppPreferences.Editor.showLineNumbers)
+  }
+
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    // Re-apply settings when the user switches dark/light mode while the editor is open,
+    // but only when no explicit theme is stored (i.e., user wants "Auto" behaviour).
+    if previousTraitCollection?.userInterfaceStyle != traitCollection.userInterfaceStyle,
+       AppPreferences.Editor.theme.isEmpty {
+      applySettingsToEditor()
+    }
   }
 
   // MARK: - Document Save
@@ -311,7 +321,7 @@ final class EditorViewController: UIViewController {
   private func makeEditorHTML() -> String {
     let config = EditorConfig(
       text: "",
-      theme: AppPreferences.Editor.theme,
+      theme: AppPreferences.Editor.effectiveTheme(for: traitCollection.userInterfaceStyle),
       fontFace: WebFontFace(family: "ui-monospace, monospace", weight: nil, style: nil),
       fontSize: AppPreferences.Editor.fontSize,
       showLineNumbers: AppPreferences.Editor.showLineNumbers,

@@ -10,9 +10,23 @@ import MarkEditCore
 
 enum AppPreferences {
   enum Editor {
+    /// The user's explicitly stored theme name, or "" if they have never chosen one
+    /// (meaning the editor should follow the system appearance automatically).
     static var theme: String {
-      get { UserDefaults.standard.string(forKey: "ios.editor.theme") ?? defaultTheme }
+      get { UserDefaults.standard.string(forKey: "ios.editor.theme") ?? "" }
       set { UserDefaults.standard.set(newValue, forKey: "ios.editor.theme") }
+    }
+
+    /// Resolves the theme to apply to the editor, using the stored preference when
+    /// the user has made an explicit choice, or falling back to a system-appearance-
+    /// appropriate default otherwise.
+    ///
+    /// Always call this from a view context so `style` reflects the actual window
+    /// appearance — do NOT use `UITraitCollection.current.userInterfaceStyle` here.
+    static func effectiveTheme(for style: UIUserInterfaceStyle) -> String {
+      let stored = UserDefaults.standard.string(forKey: "ios.editor.theme") ?? ""
+      if !stored.isEmpty { return stored }
+      return style == .dark ? "GitHub Dark" : "GitHub Light"
     }
 
     static var fontSize: Double {
@@ -31,14 +45,6 @@ enum AppPreferences {
     static var showLineNumbers: Bool {
       get { UserDefaults.standard.object(forKey: "ios.editor.showLineNumbers") as? Bool ?? false }
       set { UserDefaults.standard.set(newValue, forKey: "ios.editor.showLineNumbers") }
-    }
-
-    // GitHub Light for light mode, GitHub Dark for dark mode
-    private static var defaultTheme: String {
-      switch UITraitCollection.current.userInterfaceStyle {
-      case .dark: return "GitHub Dark"
-      default: return "GitHub Light"
-      }
     }
   }
 }
