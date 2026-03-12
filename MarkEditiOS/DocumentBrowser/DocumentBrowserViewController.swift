@@ -35,7 +35,7 @@ final class DocumentBrowserViewController: UIDocumentBrowserViewController {
     allowsPickingMultipleItems = false
     view.tintColor = .systemBlue
 
-    print("[DocumentBrowserViewController] viewDidLoad — view.frame: \(view.frame)")
+    NSLog("[MarkEditiOS] DocumentBrowserViewController viewDidLoad — view.frame: %@", NSCoder.string(for: view.frame))
   }
 }
 
@@ -97,10 +97,12 @@ extension DocumentBrowserViewController: UIDocumentBrowserViewControllerDelegate
 
 private extension DocumentBrowserViewController {
   func presentEditorForDocument(at url: URL) {
+    NSLog("[MarkEditiOS] DocumentBrowserViewController opening document: %@", url.lastPathComponent)
     let document = MarkEditDocument(fileURL: url)
 
     document.open { [weak self] success in
       guard let self, success else {
+        NSLog("[MarkEditiOS] DocumentBrowserViewController failed to open document: %@", url.lastPathComponent)
         let alert = UIAlertController(
           title: "Could Not Open File",
           message: "The file could not be opened.",
