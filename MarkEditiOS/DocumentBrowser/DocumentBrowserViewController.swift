@@ -15,7 +15,7 @@ final class DocumentBrowserViewController: UIDocumentBrowserViewController {
     // Using the bare default init() without content types can produce a blank/dark
     // screen because UIDocumentBrowserViewController doesn't know what to display.
     let markdownType = UTType("net.daringfireball.markdown") ?? .plainText
-    super.init(forOpeningContentTypes: [markdownType, .plainText])
+    super.init(forOpening: [markdownType, .plainText])
   }
 
   @available(*, unavailable)
