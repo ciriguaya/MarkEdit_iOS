@@ -29,38 +29,7 @@ final class DocumentBrowserViewController: UIDocumentBrowserViewController {
     delegate = self
     allowsDocumentCreation = true
     allowsPickingMultipleItems = false
-    browserUserInterfaceStyle = .light  // force light mode so UI is clearly visible
     view.tintColor = .systemBlue
-
-    NSLog("[MarkEditiOS] DocumentBrowserViewController viewDidLoad — view.frame: %@", NSCoder.string(for: view.frame))
-  }
-
-  override func viewDidAppear(_ animated: Bool) {
-    super.viewDidAppear(animated)
-    NSLog("[MarkEditiOS] DocumentBrowserViewController viewDidAppear")
-
-    // Diagnostic banner: bright label pinned to the top of the window so it appears
-    // above all UIDocumentBrowserViewController system content. Remove once confirmed.
-    if view.window?.viewWithTag(9999) == nil {
-      let banner = UILabel()
-      banner.tag = 9999
-      banner.text = "  MarkEdit iOS — tap + to create a document"
-      banner.font = .boldSystemFont(ofSize: 14)
-      banner.backgroundColor = .systemYellow
-      banner.textColor = .black
-      banner.numberOfLines = 1
-      banner.translatesAutoresizingMaskIntoConstraints = false
-      // Add to the window so it floats above everything
-      if let window = view.window {
-        window.addSubview(banner)
-        NSLayoutConstraint.activate([
-          banner.topAnchor.constraint(equalTo: window.safeAreaLayoutGuide.topAnchor),
-          banner.leadingAnchor.constraint(equalTo: window.leadingAnchor),
-          banner.trailingAnchor.constraint(equalTo: window.trailingAnchor),
-          banner.heightAnchor.constraint(equalToConstant: 36),
-        ])
-      }
-    }
   }
 }
 
