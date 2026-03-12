@@ -15,11 +15,15 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   ) {
     guard let windowScene = scene as? UIWindowScene else { return }
 
+    NSLog("[MarkEditiOS] SceneDelegate scene(willConnectTo:) — creating window")
+
     let window = UIWindow(windowScene: windowScene)
     let documentBrowser = DocumentBrowserViewController()
     window.rootViewController = documentBrowser
     self.window = window
     window.makeKeyAndVisible()
+
+    NSLog("[MarkEditiOS] SceneDelegate makeKeyAndVisible done, window.frame=%@", NSCoder.string(for: window.frame))
   }
 
   func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
