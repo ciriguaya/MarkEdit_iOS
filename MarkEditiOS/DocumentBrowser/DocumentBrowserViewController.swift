@@ -90,20 +90,34 @@ extension DocumentBrowserViewController: UIDocumentBrowserViewControllerDelegate
 // MARK: - Private
 
 private extension DocumentBrowserViewController {
-  func presentEditorForDocument(at url: URL) {
+  /// Opens a document and presents the editor.
+  ///
+  /// Third-party cloud providers (e.g. Google Drive) run as File Provider extensions
+  /// that may need a moment to start their XPC service on the first access.
+  /// If `UIDocument.open` fails on the first attempt we retry once after a short
+  /// delay, which covers the common case of the extension being dormant at launch.
+  func presentEditorForDocument(at url: URL, retryCount: Int = 0) {
     NSLog("[MarkEditiOS] DocumentBrowserViewController opening document: %@", url.lastPathComponent)
     let document = MarkEditDocument(fileURL: url)
 
     document.open { [weak self] success in
-      guard let self, success else {
+      guard let self else { return }
+      guard success else {
         NSLog("[MarkEditiOS] DocumentBrowserViewController failed to open document: %@", url.lastPathComponent)
-        let alert = UIAlertController(
-          title: "Could Not Open File",
-          message: "The file could not be opened.",
-          preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        self?.present(alert, animated: true)
+        if retryCount == 0 {
+          // Give the file provider extension time to start up, then retry once.
+          DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            self?.presentEditorForDocument(at: url, retryCount: 1)
+          }
+        } else {
+          let alert = UIAlertController(
+            title: "Could Not Open File",
+            message: "The file could not be opened. If it is stored in a cloud service, make sure it is downloaded to your device.",
+            preferredStyle: .alert
+          )
+          alert.addAction(UIAlertAction(title: "OK", style: .default))
+          self.present(alert, animated: true)
+        }
         return
       }
 

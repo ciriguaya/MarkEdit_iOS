@@ -57,6 +57,12 @@ private struct SettingsView: View {
   @AppStorage("ios.editor.showLineNumbers")
   private var showLineNumbers: Bool = false
 
+  // "" means "Auto — follow system dark/light appearance"
+  @AppStorage("ios.editor.theme")
+  private var selectedTheme: String = ""
+
+  @Environment(\.colorScheme) private var colorScheme
+
   private let themes = [
     "GitHub Light",
     "GitHub Dark",
@@ -68,13 +74,15 @@ private struct SettingsView: View {
     "Gruvbox Dark",
   ]
 
-  @AppStorage("ios.editor.theme")
-  private var selectedTheme: String = "GitHub Light"
+  private var autoLabel: String {
+    colorScheme == .dark ? "Auto — GitHub Dark" : "Auto — GitHub Light"
+  }
 
   var body: some View {
     Form {
       Section("Appearance") {
         Picker("Theme", selection: $selectedTheme) {
+          Text(autoLabel).tag("")
           ForEach(themes, id: \.self) { theme in
             Text(theme).tag(theme)
           }
